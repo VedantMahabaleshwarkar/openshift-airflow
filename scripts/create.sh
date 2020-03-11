@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_NAME='airflow'
+PROJECT_NAME='os-airflow'
 
 # Create the base-container project that contains the images
 oadm new-project $PROJECT_NAME --display-name=$PROJECT_NAME --description='Apache Airflow on OpenShift'

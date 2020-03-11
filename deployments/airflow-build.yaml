@@ -5,33 +5,33 @@ items:
 - kind: "BuildConfig"
   apiVersion: "v1"
   metadata:
-    name: "airflow-image" 
+    name: "airflow-image"
   spec:
-    
-    runPolicy: "Serial" 
-    
+
+    runPolicy: "Serial"
+
     triggers:
       - type: ConfigChange
       - github:
           secret: airflow
         type: GitHub
-    
-    source: 
+
+    source:
       git:
-        uri: "https://github.com/majordomusio/openshift-airflow"
+        uri: "https://github.com/VedantMahabaleshwarkar/openshift-airflow"
         ref: "master"
       contextDir: "airflow"
-    
+
     strategy:
       type: Docker
       dockerStrategy:
         dockerfilePath: Dockerfile
         forcePull: true
-        
+
     output:
       to:
         kind: ImageStreamTag
-        name: 'airflow:1.10.11'
+        name: 'airflow:1.10.9'
 
 - kind: ImageStream
   apiVersion: "v1"
