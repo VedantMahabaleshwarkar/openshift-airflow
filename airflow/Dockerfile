@@ -67,22 +67,22 @@ RUN useradd -u ${USER_ID} -r -g 0 -d ${HOME} -s /sbin/nologin \
 RUN chmod 766 /etc/passwd && chmod 766 /etc/group
 
 # Install the OpenShift CLI
-#ENV OPENSHIFT_CLI_BINARY="openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit" \
-#    OPENSHIFT_VERSION="v3.11.0"
+ENV OPENSHIFT_CLI_BINARY="openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit" \
+    OPENSHIFT_VERSION="v3.11.0"
 
-#RUN curl -L -0 "https://github.com/openshift/origin/releases/download/${OPENSHIFT_VERSION}/${OPENSHIFT_CLI_BINARY}.tar.gz" | tar -zx -C /tmp && \
-#    mv /tmp/${OPENSHIFT_CLI_BINARY}/oc /usr/bin && \
-#    mv /tmp/${OPENSHIFT_CLI_BINARY}/kubectl /usr/bin
+RUN curl -L -0 "https://github.com/openshift/origin/releases/download/${OPENSHIFT_VERSION}/${OPENSHIFT_CLI_BINARY}.tar.gz" | tar -zx -C /tmp && \
+    mv /tmp/${OPENSHIFT_CLI_BINARY}/oc /usr/bin && \
+    mv /tmp/${OPENSHIFT_CLI_BINARY}/kubectl /usr/bin
 
 #
 # Install Airflow
 #
 
-ARG AIRFLOW_VERSION=1.10.9
-ARG AIRFLOW_HOME=/usr/local/airflow
-ARG AIRFLOW_DEPS=""
-ARG PYTHON_DEPS=""
-ENV AIRFLOW_HOME=${AIRFLOW_HOME}
+ENV AIRFLOW_VERSION=1.10.9 \
+    AIRFLOW_HOME="/usr/local/app" \
+    AIRFLOW_GPL_UNIDECODE="True" \
+    AIRFLOW_CMD="webserver" \
+    AIRFLOW_MODULES=apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh]
 
 ENV PYTHONPATH=${PYTHONPATH:+${PYTHONPATH}:}${AIRFLOW_HOME}
 
@@ -97,9 +97,7 @@ RUN virtualenv-$PYTHON_VERSION ${AIRFLOW_HOME} && \
     chown -R ${USER_ID}:0 ${AIRFLOW_HOME} && \
     fix-permissions ${AIRFLOW_HOME} -P
 
-RUN ${PIP_ALIAS} install --no-cache-dir apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
-    && ${PIP_ALIAS} install 'redis==3.2' \
-    && ${PIP_ALIAS} install airflow-exporter
+RUN ${PIP_ALIAS} install --no-cache-dir ${AIRFLOW_MODULES}==${AIRFLOW_VERSION}
 
 # Create directories so we can own them when we mount volumes
 RUN mkdir -p ${AIRFLOW_HOME}/logs && mkdir -p ${AIRFLOW_HOME}/dags
