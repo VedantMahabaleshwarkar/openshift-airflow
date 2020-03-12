@@ -54,6 +54,7 @@ COPY ./include/ /
 RUN mkdir -p ${HOME}/.pki/nssdb && \
     chown -R ${USER_ID}:0 ${HOME}/.pki && \
     dnf -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
+    dnf -y mariadb-devel && \
     rpm -V $INSTALL_PKGS && \
     dnf -y clean all --enablerepo='*' && \
     fix-rpm-file-permissions
